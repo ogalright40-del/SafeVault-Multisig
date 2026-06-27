@@ -55,44 +55,6 @@ A fully auditable, reentrancy-protected multi-signature wallet built with Solidi
 
 ---
 
-## Architecture Diagram
-
-```mermaid
-graph TB
-    subgraph Frontend ["Frontend (React + Vite)"]
-        UI["UI Components\n(Header, WalletInfo,\nSubmitForm, TxTable)"]
-        Hook["useWallet Hook\n(ethers.js)"]
-        ABI["ABI / Deployments\n(JSON)"]
-    end
-
-    subgraph MetaMask ["MetaMask / Browser Wallet"]
-        MM["BrowserProvider\nSigner"]
-    end
-
-    subgraph Blockchain ["EVM Blockchain"]
-        subgraph Contract ["MultiSigWallet.sol"]
-            State["State\n(owners, required,\ntransactions[], approved[])"]
-            Fns["Functions\n(submit, approve,\nrevoke, execute)"]
-            Events["Events\n(Deposit, Submit,\nApprove, Revoke,\nExecute)"]
-            Guard["Guards\n(onlyOwner,\ntxExists,\nnotExecuted,\nnotApproved)"]
-            OZ["OpenZeppelin\nReentrancyGuard"]
-        end
-    end
-
-    UI -->|calls| Hook
-    Hook -->|reads| ABI
-    Hook <-->|eth_requestAccounts\neth_sendTransaction| MM
-    MM <-->|JSON-RPC| Blockchain
-    Contract --> Events
-    Events -->|contract.on()| Hook
-    Hook -->|setState| UI
-    OZ --> Fns
-    Guard --> Fns
-    Fns <--> State
-```
-
----
-
 ## Folder Structure
 
 ```
